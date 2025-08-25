@@ -33,12 +33,25 @@ def deslocar_letras(texto, numdesc):
 
     return conteudo_cifrado
 
+def aplicar_mascara(texto, mascara):
+    conteudo_cifrado = ""
+    for caracter in texto:
+        if caracter.lower() in mascara:  # substitui mantendo maiúscula~minúscula
+            simbolo = mascara[caracter.lower()]
+            conteudo_cifrado += simbolo.upper() if caracter.isupper() else simbolo
+        else:
+            conteudo_cifrado += caracter
+    return conteudo_cifrado
 
 def salvar_arquivo(nome_arquivo, nome_metodo, conteudo):
-    novo_arquivo = nome_arquivo.split(".")[0]
-    with open(novo_arquivo + "-" + nome_metodo, 'w', encoding='utf-8') as f:
-        f.write(conteudo)
-
+    try:
+        base = nome_arquivo.rsplit(".", 1)[0]   # pegará só o nome antes da extensão
+        novo_nome = f"{base}-{nome_metodo}.txt" # vai montar o novo nome final
+        with open(novo_nome, 'w', encoding='utf-8') as f:
+            f.write(conteudo)
+        print(f"Resultado salvo em {novo_nome}")
+    except Exception as e:
+        print(f"Erro ao salvar arquivo: {e}")
 
 if __name__ == '__main__':
 
@@ -61,7 +74,7 @@ if __name__ == '__main__':
         resultado = cifrar_invertido(conteudo)
         print("Mensagem invertida:")
         print(resultado)
-        salvar_arquivo(nome_arquivo, "deslocar_letras.txt", resultado)
+        salvar_arquivo(nome_arquivo, "invertida", resultado)
 
     elif userchoice == 2:
         try:
@@ -72,16 +85,35 @@ if __name__ == '__main__':
                 print(
                     f'Você escolheu deslocar {numdesc} caracteres. Confira o conteúdo cifrado abaixo e também no novo arquivo')
                 print(resultado)
-                salvar_arquivo(nome_arquivo, "saida_invertida.txt", resultado)
+                salvar_arquivo(nome_arquivo, "deslocar_letras", resultado)
 
             else:
                 print(f'Você escolheu um número fora do intervalo indicado')
 
         except ValueError:
-            print(f'Você digitou um valor inválido e explodiu a cabeça do programa')
+            print(f'Você digitou um valor inválido!')
 
     elif userchoice == 3:
-        print("teste 3")
+        mascara = {
+            'a': '@', 'e': '3', 'i': '1', 'o': '0', 'u': '|_|',
+            'á': '@', 'à': '4', 'ã': 'ã̃', 'â': '^a',
+            'é': '&', 'ê': '€',
+            'í': '!',
+            'ó': '°', 'ô': 'ö', 'õ': 'õ̃',
+            'ú': 'µ', 'ü': 'ü̈',
+            'ç': '¢',
+            'b': '8', 'c': '(', 'd': '|)', 'f': '#', 'g': '9', 'h': '}{',
+            'j': '_|', 'k': '|<', 'l': '1_', 'm': '(V)', 'n': '|\\|',
+            'p': '|*', 'q': '0_', 'r': '12', 's': '$', 't': '7',
+            'v': '\\/', 'w': '\\/\\/', 'x': '><', 'y': '`/', 'z': '2',
+            '.': '*', ',': '~', '!': '¡', '?': '¿', ';': ':', ':': ';',
+            '"': '”', "'": '`', '(': '[', ')': ']', '-': '_', '_': '-',
+        }
+
+        resultado = aplicar_mascara(conteudo, mascara)
+        print("Mensagem com máscara personalizada:")
+        print(resultado)
+        salvar_arquivo(nome_arquivo, "saida_mascara", resultado)
 
     else:
-        print(f'Você não selecionou uma opção válida! isso explodiu a cabeça do programa')
+        print(f'Você não selecionou uma opção válida!')
